@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name        Next comment in Pull Request
+// @name        Comment Navigator in Pull Request
 // @namespace   dorian.marchal
 // @include     https://github.com/*/pull/*
-// @version     1
+// @version     2
 // @grant       none
 // ==/UserScript==
 
@@ -16,11 +16,11 @@ var goToComment = function (index) {
       goToComment(currentCommentIndex);
       break;
     case '+1':
-      currentCommentIndex = Math.min($('.timeline-comment:visible').length - 1, currentCommentIndex + 1);
+      currentCommentIndex = Math.min($('.inline-comments:visible').length - 1, currentCommentIndex + 1);
       goToComment(currentCommentIndex);
       break;
     default:
-      location.hash = '#' + $('.timeline-comment:visible').eq(index).attr('id');
+      location.hash = '#' + $('.inline-comments:visible').eq(index).find('.timeline-comment').attr('id');
   }
 }
 
