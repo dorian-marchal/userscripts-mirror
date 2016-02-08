@@ -10,7 +10,7 @@ var issueRows = document.getElementsByClassName('issuerow');
 
 for (var i = 0; i < issueRows.length; ++i) {
   var row = issueRows[i];
-  console.log(row.childNodes[0]);
+
   // No icon on opened issues.
   if (row.querySelectorAll('.ghx-accept').length > 0) {
     row.style.opacity = 0.35;
