@@ -2,7 +2,8 @@
 // @name        Comment Navigator in Pull Request
 // @namespace   dorian.marchal
 // @include     https://github.com/*/pull/*
-// @version     2
+// @require https://code.jquery.com/jquery-2.2.3.min.js
+// @version     3
 // @grant       none
 // ==/UserScript==
 
