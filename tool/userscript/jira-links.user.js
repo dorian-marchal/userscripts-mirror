@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         Slack links
-// @version      0.2
+// @version      0.3
 // @description  Replaces link text for Github PRs and JIRA tickets.
+// @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @match        https://wgaming.slack.com/*
 // @grant        GM_xmlhttpRequest
 // @connect      jira.webedia.fr
