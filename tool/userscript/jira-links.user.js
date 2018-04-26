@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Slack links
-// @version      0.1
+// @version      0.2
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @match        https://wgaming.slack.com/*
 // @grant        GM_xmlhttpRequest
@@ -11,6 +11,22 @@
 const parser = new DOMParser();
 const alreadyReplacedClass = '__REPLACED__';
 const pageNamesPromises = {};
+
+// From https://github.com/lodash/lodash/blob/4.17.5/lodash.js#L14242
+const htmlEscape = (stringToEscape) => {
+  const reUnescapedHtml = /[&<>"']/g;
+  const reHasUnescapedHtml = RegExp(reUnescapedHtml.source);
+  const htmlEscapes = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return stringToEscape && reHasUnescapedHtml.test(stringToEscape)
+    ? stringToEscape.replace(reUnescapedHtml, (key) => htmlEscapes[key])
+    : stringToEscape;
+};
 
 const iconTemplate = (base64png) => `<img style="vertical-align: text-top;" src="data:image/png;base64,${base64png}"/>`;
 const jiraIconHtml = iconTemplate(`
@@ -62,11 +78,13 @@ const getPageName = async function(pageUrl, extractNameFromDocument) {
 const nameExtractorCreatorByPattern = {
   '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
-    return titleElement ? `${jiraIconHtml} ${jiraId} ${titleElement.textContent}` : null;
+    const title = htmlEscape(titleElement.textContent);
+    return titleElement ? `${jiraIconHtml} ${jiraId} ${title}` : null;
   },
   '^https://github.com/.*?/(.*?)/pull/(\\d+)': (projectName, prId) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
-    return titleElement ? `${githubIconHtml} PR ${titleElement.textContent.trim()} (${projectName}#${prId})` : null;
+    const title = htmlEscape(titleElement.textContent.trim());
+    return titleElement ? `${githubIconHtml} PR ${title} (${projectName}#${prId})` : null;
   }
 };
 
@@ -83,7 +101,7 @@ const replaceLinksText = function() {
         return;
       }
 
-      const capturedParams = matches.slice(1);
+      const capturedParams = matches.slice(1).map(htmlEscape);
       getPageName(linkText, nameExtractorCreatorByPattern[pattern](...capturedParams)).then((pageName) => {
         if (pageName) {
           link.innerHTML = pageName;
