@@ -8,13 +8,9 @@
 // @connect      github.com
 // ==/UserScript==
 
-const parser = new window.DOMParser();
+const parser = new DOMParser();
 const alreadyReplacedClass = '__REPLACED__';
-
-// FIXME URL suffixes, lines, etc.
-
-//  FIXME promises
-const pageNames = {};
+const pageNamesPromises = {};
 
 const crossOriginRequest = (url) =>
   new Promise((resolve, reject) => {
@@ -26,18 +22,16 @@ const crossOriginRequest = (url) =>
     });
   });
 
-// FIXME async
-function getPageName(pageUrl, extractNameFromDocument, callback) {
-  if (pageNames[pageUrl]) {
-    setImmediate(() => callback(pageNames[pageUrl]));
+const getPageName = async function(pageUrl, extractNameFromDocument) {
+  if (!pageNamesPromises[pageUrl]) {
+    pageNamesPromises[pageUrl] = crossOriginRequest(pageUrl).then((response) => {
+      const doc = parser.parseFromString(response.responseText, 'text/html');
+      return extractNameFromDocument(doc);
+    });
   }
 
-  crossOriginRequest(pageUrl).then((response) => {
-    const doc = parser.parseFromString(response.responseText, 'text/html');
-    pageNames[pageUrl] = extractNameFromDocument(doc);
-    callback(pageNames[pageUrl]);
-  });
-}
+  return pageNamesPromises[pageUrl];
+};
 
 const nameExtractorCreatorByPattern = {
   '^https://jira.webedia.fr/browse/(.*)$': (jiraId) => (doc) => {
@@ -50,8 +44,8 @@ const nameExtractorCreatorByPattern = {
   }
 };
 
-function replaceLinksText() {
-  window.document.querySelectorAll(`.c-message__body a:not(.${alreadyReplacedClass})`).forEach((link) => {
+const replaceLinksText = function() {
+  document.querySelectorAll(`.c-message__body a:not(.${alreadyReplacedClass})`).forEach((link) => {
     const linkText = link.textContent.trim();
     Object.keys(nameExtractorCreatorByPattern).forEach((pattern) => {
       const matches = linkText.match(new RegExp(pattern));
@@ -61,7 +55,7 @@ function replaceLinksText() {
         return;
       }
 
-      getPageName(linkText, nameExtractorCreatorByPattern[pattern](...matches.slice(1)), (pageName) => {
+      getPageName(linkText, nameExtractorCreatorByPattern[pattern](...matches.slice(1))).then((pageName) => {
         if (pageName) {
           link.innerHTML = pageName;
         }
@@ -69,7 +63,7 @@ function replaceLinksText() {
       });
     });
   });
-}
+};
 
 var observer = new MutationObserver(replaceLinksText);
 observer.observe(document.querySelector('.client_main_container'), { subtree: true, childList: true });
