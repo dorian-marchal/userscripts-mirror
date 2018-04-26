@@ -34,7 +34,7 @@ const getPageName = async function(pageUrl, extractNameFromDocument) {
 };
 
 const nameExtractorCreatorByPattern = {
-  '^https://jira.webedia.fr/browse/(.*)$': (jiraId) => (doc) => {
+  '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     return titleElement ? `${jiraId} ${titleElement.textContent}` : null;
   },
