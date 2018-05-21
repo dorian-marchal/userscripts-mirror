@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name         Slack links
-// @version      0.4
+// @name         Better links
+// @version      0.5
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @match        https://wgaming.slack.com/*
+// @match        https://github.com/*
 // @grant        GM_xmlhttpRequest
 // @connect      jira.webedia.fr
 // @connect      github.com
@@ -91,7 +92,12 @@ const nameExtractorCreatorByPattern = {
 };
 
 const replaceLinksText = function() {
-  const links = document.querySelectorAll(`.c-message__body a:not(.${alreadyReplacedClass})`);
+  const jiraLinksSelector = '.c-message__body a';
+  const githubLinksSelector = '.markdown-body a';
+  const links = document.querySelectorAll(`
+    ${jiraLinksSelector}:not(.${alreadyReplacedClass}),
+    ${githubLinksSelector}:not(.${alreadyReplacedClass})
+  `);
   links.forEach((link) => {
     const linkText = link.textContent.trim();
     Object.keys(nameExtractorCreatorByPattern).forEach((pattern) => {
@@ -114,4 +120,6 @@ const replaceLinksText = function() {
 };
 
 var observer = new MutationObserver(replaceLinksText);
-observer.observe(document.querySelector('.client_main_container'), { subtree: true, childList: true });
+const jiraAppSelector = '.client_main_container';
+const githubAppSelector = '.application-main';
+observer.observe(document.querySelector(`${jiraAppSelector}, ${githubAppSelector}`), { subtree: true, childList: true });
