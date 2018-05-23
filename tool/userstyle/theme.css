@@ -1,0 +1,17 @@
+header,
+footer,
+#content-debug {
+    filter: hue-rotate(var(--angle));
+}
+
+header img,
+footer img,
+.nav-icon-jeuxvideo,
+.nav-icon-com,
+.social-network,
+.jv-nav-dropdown-avatar,
+.account-avatar-box,
+#content-debug .debug-navtab,
+#content-debug .debug-info {
+    filter: hue-rotate(var(--negative-angle));
+}
