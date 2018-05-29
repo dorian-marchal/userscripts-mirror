@@ -1,5 +1,5 @@
 /* match ^https?://www.jeuxvideo\.com.*$ */
 :root {
-    --angle: 170deg;
+    --angle: 130deg;
     --negative-angle: calc(-1 * var(--angle));
 }
