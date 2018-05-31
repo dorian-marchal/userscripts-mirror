@@ -1,4 +1,5 @@
-header,
+body > header,
+[class*=layoutWrapper__] > header,
 footer,
 #content-debug {
     filter: hue-rotate(var(--angle));
@@ -8,10 +9,20 @@ header img,
 footer img,
 .nav-icon-jeuxvideo,
 .nav-icon-com,
+header .icon-com,
 .social-network,
 .jv-nav-dropdown-avatar,
 .account-avatar-box,
 #content-debug .debug-navtab,
-#content-debug .debug-info {
+#content-debug .debug-info,
+header [class*=avatarImage__],
+header [class*=avatar__],
+header [class*=linkLogo__],
+footer [class*=facebook__],
+footer [class*=twitter__],
+footer [class*=google__],
+footer [class*=youtube__],
+footer [class*=rss__],
+footer [class*=logo__] {
     filter: hue-rotate(var(--negative-angle));
 }
