@@ -11,7 +11,7 @@
 
 const removeDuplicates = (array) => array.filter((v, i, a) => a.indexOf(v) === i);
 
-const recentWorkspacesCookieName = '__RECENT_WORKSPACES__';
+const recentWorkspacesCookieName = '__WORKSPACES_v1__';
 
 const defaultWorkspaces = [
   'www',
