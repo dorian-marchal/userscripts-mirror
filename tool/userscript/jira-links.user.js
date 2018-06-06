@@ -86,12 +86,24 @@ const nameExtractorCreatorByPattern = {
   '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
-    return titleElement ? `${jiraIconHtml} ${jiraId} ${title}` : null;
+    const stateElement = doc.querySelector('#status-val');
+    const stateText = stateElement ? stateElement.textContent.trim() : null;
+    return titleElement
+      ? `
+        ${jiraIconHtml} ${jiraId} ${title}
+        ${stateText === 'Ready' ? '(ready)' : ''}
+        ${stateText === 'In Progress' ? '(in progress)' : ''}
+        ${stateText === 'À revoir' ? '(à revoir)' : ''}
+        ${stateText === 'À valider' ? '(à valider)' : ''}
+        ${stateText === 'Terminé' ? '(terminé)' : ''}
+      `
+      : null;
   },
   '^https://github.com/.*?/(.*?)/pull/(\\d+)': (projectName, prId) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
-    const stateText = doc.querySelector('.gh-header .State').textContent.trim();
+    const stateElement = doc.querySelector('.gh-header .State');
+    const stateText = stateElement ? stateElement.textContent.trim() : null;
     return titleElement
       ? `
         ${githubIconHtml} PR ${title} (${projectName}#${prId})
