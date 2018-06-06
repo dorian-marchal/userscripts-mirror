@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.6
+// @version      0.12
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -12,7 +12,10 @@
 // ==/UserScript==
 
 const parser = new DOMParser();
-const alreadyReplacedClass = '__REPLACED__';
+
+const CACHE_DURATION_MS = 1 * 60 * 1000;
+const ALREADY_REPLACED_CLASS = '__REPLACED__';
+
 const pageNamesPromises = {};
 
 // From https://github.com/lodash/lodash/blob/4.17.5/lodash.js#L14242
@@ -31,7 +34,7 @@ const htmlEscape = (stringToEscape) => {
     : stringToEscape;
 };
 
-const iconTemplate = (base64png) => `<img style="vertical-align: text-top;" src="data:image/png;base64,${base64png}"/>`;
+const iconTemplate = (base64png) => `<img style="vertical-align: middle;" src="data:image/png;base64,${base64png}"/>`;
 const jiraIconHtml = iconTemplate(`
   iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
   WXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gQaCjgfynw1ygAAATRJREFUOMuNk8FRw0AMRd9mKMBU
@@ -41,6 +44,24 @@ const jiraIconHtml = iconTemplate(`
   4MPYFVBrUgPsgZ2Jv2XjwjhfgXttuwDegQeN7cwQW8X2XmOpbWZwo7o0hSaSYtNLcIbEykJS3FrH
   nz1Q9s2Q5P8WqdGbsHLTBxz17P8Y+AJuOyRr58NsSAdPqh9V701sNYRgbuy6M4/5EILCrq8+pLrz
   iyf5AXqfkHABePGAAAAAAElFTkSuQmCC
+`);
+const storyIconHtml = iconTemplate(`
+  iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+  WXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4gYGEAckUhdrMwAAAMtJREFUOMvNkj8LQXEUhp/fLx/A
+  jkk22WysDD6GuotRyEcwSQYMfA3FyqSQVVlcw83/kpiOicJN7r0GZzznvE/v2zngsRRAtp/MKJGW
+  QOBLnSkiRic97GoARJoOxABBpVQLQN8bLtyHAHx2k3K8QdgfferNDzMqo9zbrrYDvIoBIv6YrQ3t
+  9Qp/DlidFqxOC3eA43VLbVKkOs6zv6ydAayzSW1SYHexOFw31KclrLP54ZV7CXGTv50aqLsD04V+
+  +YggIoZDyBKNwS/qBtsbQG+4ScWxAAAAAElFTkSuQmCC
+`);
+const subTaskIconHtml = iconTemplate(`
+  iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+  WXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4gYGEAsAwqHA7gAAAS1JREFUOMutkz1Pg1AUhp8D2CKo
+  S6Oplg46mOjE6mB3w2Ti5A9g8Q/ZP+Dm3EmHOjs5uLcYMcZJmyLhw4FASgBDou92zrnnzXnuuRf+
+  KAFwbl8dRMbAoGWbl0jiTs53J0oWK9ftmwFSS1IZA2h5AkBT4HSg01tXi6Mfy5iHl4AoqYw+XDHI
+  NLJ0nAODp/ewyJ3sGYjA/SyonaVk0Dc1Ht9Cbp6/itzl0QZ9U2uEaazkOMe9NQAuDs1anEaDkaVz
+  ZW/RVQUAe7vDd5xWcEoG/iLibN8gjE3snU7RnKurSgWnFE29AEEYbqp0FGm10JJBlMDdbFlcXs7/
+  m5Smgr+ICOK0lAviFH8RtdvCKk6u2WfE1AvqDMTLX2MdTu1jhnmBkEjiZiYtfwLMQXH5D/0AniNg
+  2xMh/vUAAAAASUVORK5CYII=
 `);
 const githubIconHtml = iconTemplate(`
   iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
@@ -57,6 +78,15 @@ const githubIconHtml = iconTemplate(`
   EjntgPudbvdumfMbJe7aBenMssIAAAAASUVORK5CYII=
 `);
 
+const tagHtml = (label, backgroundColor, textColor = '#FFF') =>
+  `<span style="
+    background-color: ${backgroundColor};
+    color: ${textColor};
+    font-size: 12px;
+    padding: 1px 3px;
+    border-radius: 3px;
+  ">${label}</span>`;
+
 const crossOriginRequest = (url) =>
   new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
@@ -69,7 +99,7 @@ const crossOriginRequest = (url) =>
 
 const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
   if (!pageNamesPromises[pageUrl] || pageNamesPromises[pageUrl].expireDate < new Date()) {
-    const expireDate = new Date(new Date().getTime() + 5 * 60 * 1000);
+    const expireDate = new Date(new Date().getTime() + CACHE_DURATION_MS);
     pageNamesPromises[pageUrl] = {
       expireDate,
       linkHtml: crossOriginRequest(pageUrl).then((response) => {
@@ -88,14 +118,26 @@ const nameExtractorCreatorByPattern = {
     const title = htmlEscape(titleElement.textContent);
     const stateElement = doc.querySelector('#status-val');
     const stateText = stateElement ? stateElement.textContent.trim() : null;
+    const typeElement = doc.querySelector('#type-val');
+    const typeText = typeElement ? typeElement.textContent.trim() : null;
+    let iconHtml = jiraIconHtml;
+    if (typeText === 'Story') {
+      iconHtml = storyIconHtml;
+    } else if (typeText === 'Sub-task') {
+      iconHtml = subTaskIconHtml;
+    }
     return titleElement
       ? `
-        ${jiraIconHtml} ${jiraId} ${title}
-        ${stateText === 'Ready' ? '(ready)' : ''}
-        ${stateText === 'In Progress' ? '(in progress)' : ''}
-        ${stateText === 'À revoir' ? '(à revoir)' : ''}
-        ${stateText === 'À valider' ? '(à valider)' : ''}
-        ${stateText === 'Terminé' ? '(terminé)' : ''}
+        ${iconHtml}
+        ${stateText === 'Prêt' ? tagHtml('prêt', '#4a6785') : ''}
+        ${stateText === 'Open' ? tagHtml('open', '#4a6785') : ''}
+        ${stateText === 'A raffiner' ? tagHtml('à raffiner', '#4a6785') : ''}
+        ${stateText === 'À faire' ? tagHtml('à faire', '#4a6785') : ''}
+        ${stateText === 'In Progress' ? tagHtml('in progress', '#ffd351', '#000') : ''}
+        ${stateText === 'À revoir' ? tagHtml('à revoir', '#ffd351', '#000') : ''}
+        ${stateText === 'À valider' ? tagHtml('à valider', '#ffd351', '#000') : ''}
+        ${stateText === 'Terminé' ? tagHtml('✔', '#14892c') : ''}
+        ${jiraId} ${title}
       `
       : null;
   },
@@ -106,10 +148,11 @@ const nameExtractorCreatorByPattern = {
     const stateText = stateElement ? stateElement.textContent.trim() : null;
     return titleElement
       ? `
-        ${githubIconHtml} PR ${title} (${projectName}#${prId})
-        ${stateText === 'Merged' ? '(merged)' : ''}
-        ${stateText === 'Open' ? '(open)' : ''}
-        ${stateText === 'Closed' ? '(closed)' : ''}
+        ${githubIconHtml}
+        ${stateText === 'Merged' ? tagHtml('✔', '#6f42c1') : ''}
+        ${stateText === 'Open' ? tagHtml('open', '#2cbe4e') : ''}
+        ${stateText === 'Closed' ? tagHtml('✘', '#cb2431') : ''}
+        PR ${title} (${projectName}#${prId})
       `
       : null;
   }
@@ -119,13 +162,13 @@ const replaceLinksText = function() {
   const jiraLinksSelector = '.c-message__body a';
   const githubLinksSelector = '.markdown-body a';
   const links = document.querySelectorAll(`
-    ${jiraLinksSelector}:not(.${alreadyReplacedClass}),
-    ${githubLinksSelector}:not(.${alreadyReplacedClass})
+    ${jiraLinksSelector}:not(.${ALREADY_REPLACED_CLASS}),
+    ${githubLinksSelector}:not(.${ALREADY_REPLACED_CLASS})
   `);
   links.forEach((link) => {
     const linkText = link.textContent.trim();
     Object.keys(nameExtractorCreatorByPattern).forEach((pattern) => {
-      link.classList.add(alreadyReplacedClass);
+      link.classList.add(ALREADY_REPLACED_CLASS);
 
       const matches = linkText.match(new RegExp(pattern));
 
