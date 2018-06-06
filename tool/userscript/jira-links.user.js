@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.5
+// @version      0.6
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -67,15 +67,19 @@ const crossOriginRequest = (url) =>
     });
   });
 
-const getPageName = async function(pageUrl, extractNameFromDocument) {
-  if (!pageNamesPromises[pageUrl]) {
-    pageNamesPromises[pageUrl] = crossOriginRequest(pageUrl).then((response) => {
-      const doc = parser.parseFromString(response.responseText, 'text/html');
-      return extractNameFromDocument(doc);
-    });
+const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
+  if (!pageNamesPromises[pageUrl] || pageNamesPromises[pageUrl].expireDate < new Date()) {
+    const expireDate = new Date(new Date().getTime() + 5 * 60 * 1000);
+    pageNamesPromises[pageUrl] = {
+      expireDate,
+      linkHtml: crossOriginRequest(pageUrl).then((response) => {
+        const doc = parser.parseFromString(response.responseText, 'text/html');
+        return extractLinkHtmlFromDocument(doc);
+      })
+    };
   }
 
-  return pageNamesPromises[pageUrl];
+  return pageNamesPromises[pageUrl].linkHtml;
 };
 
 const nameExtractorCreatorByPattern = {
@@ -87,7 +91,15 @@ const nameExtractorCreatorByPattern = {
   '^https://github.com/.*?/(.*?)/pull/(\\d+)': (projectName, prId) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
-    return titleElement ? `${githubIconHtml} PR ${title} (${projectName}#${prId})` : null;
+    const stateText = doc.querySelector('.gh-header .State').textContent.trim();
+    return titleElement
+      ? `
+        ${githubIconHtml} PR ${title} (${projectName}#${prId})
+        ${stateText === 'Merged' ? '(merged)' : ''}
+        ${stateText === 'Open' ? '(open)' : ''}
+        ${stateText === 'Closed' ? '(closed)' : ''}
+      `
+      : null;
   }
 };
 
@@ -110,9 +122,9 @@ const replaceLinksText = function() {
       }
 
       const capturedParams = matches.slice(1).map(htmlEscape);
-      getPageName(linkText, nameExtractorCreatorByPattern[pattern](...capturedParams)).then((pageName) => {
-        if (pageName) {
-          link.innerHTML = pageName;
+      getLinkHtml(linkText, nameExtractorCreatorByPattern[pattern](...capturedParams)).then((linkHtml) => {
+        if (linkHtml) {
+          link.innerHTML = linkHtml;
         }
       });
     });
