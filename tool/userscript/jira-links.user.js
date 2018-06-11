@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.12
+// @version      0.14
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -112,7 +112,7 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
   return pageNamesPromises[pageUrl].linkHtml;
 };
 
-const nameExtractorCreatorByPattern = {
+const linkHtmlExtractorCreatorByPattern = {
   '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
@@ -121,22 +121,23 @@ const nameExtractorCreatorByPattern = {
     const typeElement = doc.querySelector('#type-val');
     const typeText = typeElement ? typeElement.textContent.trim() : null;
     let iconHtml = jiraIconHtml;
-    if (typeText === 'Story') {
+    if (['Story', 'Récit'].includes(typeText)) {
       iconHtml = storyIconHtml;
-    } else if (typeText === 'Sub-task') {
+    } else if (['Sub-task', 'Sous-tâche'].includes(typeText)) {
       iconHtml = subTaskIconHtml;
     }
     return titleElement
       ? `
         ${iconHtml}
         ${stateText === 'Prêt' ? tagHtml('prêt', '#4a6785') : ''}
-        ${stateText === 'Open' ? tagHtml('open', '#4a6785') : ''}
+        ${['Open', 'Ouverte'].includes(stateText) ? tagHtml('ouverte', '#4a6785') : ''}
         ${stateText === 'A raffiner' ? tagHtml('à raffiner', '#4a6785') : ''}
         ${stateText === 'À faire' ? tagHtml('à faire', '#4a6785') : ''}
-        ${stateText === 'In Progress' ? tagHtml('in progress', '#ffd351', '#000') : ''}
+        ${['In Progress', 'En cours'].includes(stateText) ? tagHtml('en cours', '#ffd351', '#000') : ''}
         ${stateText === 'À revoir' ? tagHtml('à revoir', '#ffd351', '#000') : ''}
         ${stateText === 'À valider' ? tagHtml('à valider', '#ffd351', '#000') : ''}
         ${stateText === 'Terminé' ? tagHtml('✔', '#14892c') : ''}
+        ${['Closed', 'Fermée'].includes(stateText) ? tagHtml('✘', '#cb2431') : ''}
         ${jiraId} ${title}
       `
       : null;
@@ -167,7 +168,7 @@ const replaceLinksText = function() {
   `);
   links.forEach((link) => {
     const linkText = link.textContent.trim();
-    Object.keys(nameExtractorCreatorByPattern).forEach((pattern) => {
+    Object.keys(linkHtmlExtractorCreatorByPattern).forEach((pattern) => {
       link.classList.add(ALREADY_REPLACED_CLASS);
 
       const matches = linkText.match(new RegExp(pattern));
@@ -177,7 +178,7 @@ const replaceLinksText = function() {
       }
 
       const capturedParams = matches.slice(1).map(htmlEscape);
-      getLinkHtml(linkText, nameExtractorCreatorByPattern[pattern](...capturedParams)).then((linkHtml) => {
+      getLinkHtml(linkText, linkHtmlExtractorCreatorByPattern[pattern](...capturedParams)).then((linkHtml) => {
         if (linkHtml) {
           link.innerHTML = linkHtml;
         }
