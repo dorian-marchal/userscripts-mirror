@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.14
+// @version      0.15
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -62,6 +62,14 @@ const subTaskIconHtml = iconTemplate(`
   ZW/RVQUAe7vDd5xWcEoG/iLibN8gjE3snU7RnKurSgWnFE29AEEYbqp0FGm10JJBlMDdbFlcXs7/
   m5Smgr+ICOK0lAviFH8RtdvCKk6u2WfE1AvqDMTLX2MdTu1jhnmBkEjiZiYtfwLMQXH5D/0AniNg
   2xMh/vUAAAAASUVORK5CYII=
+`);
+const bugIconHtml = iconTemplate(`
+  iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+  WXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4gYUCCwffUkSogAAANFJREFUOMutkj0OgkAUhL/daIGR
+  Axj0IpZqosRWK38q5UpqgrHQO0AjnV4EvIAUFBrWwkBMwATQ6Xay82Xf7IMfJQCCYXcsJDvAKJgL
+  JMJqORdHAgjJtkQYoB2jdgAyMSq8vvMJqKxabjG1OvpyjdYbgVJEnkt4tFHPRzGAvljRnMzSc3M6
+  B+B+2GTu5o6g9c2M1xiYuSPkd6BU1orj4oDIc7Pe2S1eYni036P0RikwPO2/b+LN7KoqX2g4V/Hz
+  HiSAoELWTwESYZWE+EIoi3/oBVSONPJcIlHxAAAAAElFTkSuQmCC
 `);
 const githubIconHtml = iconTemplate(`
   iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
@@ -125,6 +133,8 @@ const linkHtmlExtractorCreatorByPattern = {
       iconHtml = storyIconHtml;
     } else if (['Sub-task', 'Sous-tâche'].includes(typeText)) {
       iconHtml = subTaskIconHtml;
+    } else if (['Bug', 'Bogue'].includes(typeText)) {
+      iconHtml = bugIconHtml;
     }
     return titleElement
       ? `
