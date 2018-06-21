@@ -1,13 +1,23 @@
 // ==UserScript==
 // @name         Respawn Workspace Switcher
-// @version      0.11
+// @version      0.12
 // @description  Adds workspace switcher in Respawn debug bar
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @match        http://*.jeuxvideo.com/*
 // @match        https://*.jeuxvideo.com/*
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
+
+GM_addStyle(`
+#content-debug select {
+  height: 100%;
+  max-width: 280px
+}
+#content-debug.hiddenDebugBar select {
+  display: none;
+}
+`);
 
 const removeDuplicates = (array) => array.filter((v, i, a) => a.indexOf(v) === i);
 
@@ -53,7 +63,6 @@ if (currentWorkspace.endsWith('.dev')) {
 const workspaces = removeDuplicates([...defaultWorkspaces, ...recentWorkspaces]);
 
 const workspaceList = document.createElement('select');
-workspaceList.style = 'height: 100%;max-width:280px';
 
 const defaultOption = document.createElement('option');
 defaultOption.label = 'Workspace...';
