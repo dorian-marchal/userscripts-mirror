@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.15
+// @version      0.18
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -152,7 +152,7 @@ const linkHtmlExtractorCreatorByPattern = {
       `
       : null;
   },
-  '^https://github.com/.*?/(.*?)/pull/(\\d+)': (projectName, prId) => (doc) => {
+  '^https://github.com/.*?/(.*?)/pull/(\\d+)(?:/commits/([a-f0-9]{6}))?': (projectName, prId, commitHash) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
     const stateElement = doc.querySelector('.gh-header .State');
@@ -163,7 +163,8 @@ const linkHtmlExtractorCreatorByPattern = {
         ${stateText === 'Merged' ? tagHtml('✔', '#6f42c1') : ''}
         ${stateText === 'Open' ? tagHtml('open', '#2cbe4e') : ''}
         ${stateText === 'Closed' ? tagHtml('✘', '#cb2431') : ''}
-        PR ${title} (${projectName}#${prId})
+        PR ${title}
+        (${commitHash ? `commit ${commitHash}, ` : ''}${projectName}#${prId})
       `
       : null;
   }
