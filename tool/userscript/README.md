@@ -13,5 +13,5 @@
   Un lien d'US sur Github :
   ![](http://image.noelshack.com/fichiers/2018/25/2/1529396033-github.png)
 
-  Des liens de PR et de billets sur Slack : 
+  Des liens de PR et de billets sur Slack :
   ![](http://image.noelshack.com/fichiers/2018/25/2/1529396029-slack.png)

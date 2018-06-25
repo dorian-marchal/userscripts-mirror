@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Respawn Workspace Switcher
-// @version      0.12
+// @version      0.13
 // @description  Adds workspace switcher in Respawn debug bar
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
@@ -14,7 +14,8 @@ GM_addStyle(`
   height: 100%;
   max-width: 280px
 }
-#content-debug.hiddenDebugBar select {
+#content-debug.hiddenDebugBar select,
+#content-debug.on select {
   display: none;
 }
 `);
