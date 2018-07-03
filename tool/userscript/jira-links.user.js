@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.19
+// @version      0.20
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -121,6 +121,7 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
 };
 
 const linkHtmlExtractorCreatorByPattern = {
+  // JIRA.
   '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
@@ -152,6 +153,7 @@ const linkHtmlExtractorCreatorByPattern = {
       `
       : null;
   },
+  // Github Pull Request.
   '^https://github.com/.*?/(.*?)/pull/(\\d+)(?:/commits/([a-f0-9]{6}))?': (projectName, prId, commitHash) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
@@ -167,6 +169,17 @@ const linkHtmlExtractorCreatorByPattern = {
         (${commitHash ? `commit ${commitHash}, ` : ''}${projectName}#${prId})
       `
       : null;
+  },
+  // Github ref link.
+  '^https://github.com/(.*?)/(.*?)/tree/([^/?]*?)$': (remote, repo, ref) => (doc) => {
+    const lastModifiedElement = doc.querySelector('.commit-tease.js-details-container [itemprop=dateModified]');
+    const isProbablyACommitHash = /^[a-f0-9]{5,}$/.test(ref);
+    const lastModified = htmlEscape(lastModifiedElement.textContent.trim());
+    return `
+      ${githubIconHtml}
+      ${isProbablyACommitHash ? 'Commit' : 'Branche'}
+      ${ref} sur ${remote}/${repo} (${lastModified})
+    `;
   }
 };
 
