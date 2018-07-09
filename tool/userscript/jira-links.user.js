@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.21
+// @version      0.22
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -148,7 +148,7 @@ const linkHtmlExtractorCreatorByPattern = {
         ${stateText === 'À revoir' ? tagHtml('à revoir', '#ffd351', '#000') : ''}
         ${stateText === 'À valider' ? tagHtml('à valider', '#ffd351', '#000') : ''}
         ${stateText === 'Terminé' ? tagHtml('✔', '#14892c') : ''}
-        ${['Closed', 'Fermée'].includes(stateText) ? tagHtml('✘', '#cb2431') : ''}
+        ${['Closed', 'Fermée'].includes(stateText) ? tagHtml('✘', '#14892c') : ''}
         ${jiraId} ${title}
       `
       : null;
