@@ -122,7 +122,7 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
 
 const linkHtmlExtractorCreatorByPattern = {
   // JIRA.
-  '^https://jira.webedia.fr/browse/([^?]*)': (jiraId) => (doc) => {
+  '^https://jira.webedia.fr/browse/([^?]*)(?:\\?focusedCommentId=(\\d+))?': (jiraId, commentId) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
     const stateElement = doc.querySelector('#status-val');
@@ -137,6 +137,7 @@ const linkHtmlExtractorCreatorByPattern = {
     } else if (['Bug', 'Bogue'].includes(typeText)) {
       iconHtml = bugIconHtml;
     }
+    const isCommentLink = commentId !== undefined;
     return titleElement
       ? `
         ${iconHtml}
@@ -150,6 +151,7 @@ const linkHtmlExtractorCreatorByPattern = {
         ${stateText === 'Terminé' ? tagHtml('✔', '#14892c') : ''}
         ${['Closed', 'Fermée'].includes(stateText) ? tagHtml('✘', '#14892c') : ''}
         ${jiraId} ${title}
+        ${isCommentLink ? `(commentaire ${commentId})` : ''}
       `
       : null;
   },
