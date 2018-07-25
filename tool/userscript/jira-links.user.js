@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.22
+// @version      0.23
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -121,8 +121,10 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
 };
 
 const linkHtmlExtractorCreatorByPattern = {
-  // JIRA.
-  '^https://jira.webedia.fr/browse/([^?]*)(?:\\?focusedCommentId=(\\d+))?': (jiraId, commentId) => (doc) => {
+  // JIRA (https://regex101.com/r/hgS2iF/1).
+  [/^https:\/\/jira.webedia.fr\/browse\/([^?\s]*)(?:\?focusedCommentId=(\d+))?/.source]: (jiraId, commentId) => (
+    doc
+  ) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
     const stateElement = doc.querySelector('#status-val');
@@ -155,8 +157,12 @@ const linkHtmlExtractorCreatorByPattern = {
       `
       : null;
   },
-  // Github Pull Request.
-  '^https://github.com/.*?/(.*?)/pull/(\\d+)(?:/commits/([a-f0-9]{6}))?': (projectName, prId, commitHash) => (doc) => {
+  // Github Pull Request (https://regex101.com/r/PEzcHy/1).
+  [/^https:\/\/github.com\/.*?\/(.*?)\/pull\/(\d+)(?:\/commits\/([a-f0-9]{6}))?/.source]: (
+    projectName,
+    prId,
+    commitHash
+  ) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
     const stateElement = doc.querySelector('.gh-header .State');
@@ -172,8 +178,8 @@ const linkHtmlExtractorCreatorByPattern = {
       `
       : null;
   },
-  // Github ref link.
-  '^https://github.com/(.*?)/(.*?)/tree/([^/?]*?)$': (remote, repo, ref) => (doc) => {
+  // Github ref link (https://regex101.com/r/vECMyJ/1).
+  [/^https:\/\/github.com\/(.*?)\/(.*?)\/tree\/([^\/?]*?)$/.source]: (remote, repo, ref) => (doc) => {
     const lastModifiedElement = doc.querySelector('.commit-tease.js-details-container [itemprop=dateModified]');
     const isProbablyABranch = !/^[a-f0-9]{5,}$/.test(ref);
     const lastModified = htmlEscape(lastModifiedElement.textContent.trim());
@@ -183,8 +189,8 @@ const linkHtmlExtractorCreatorByPattern = {
       ${ref} sur ${remote}/${repo} (${lastModified})
     `;
   },
-  // Github commit link.
-  '^https://github.com/(.*?)/(.*?)/commit/([0-9a-f]+?)$': (remote, repo, hash) => (doc) => {
+  // Github commit link (https://regex101.com/r/bAbZf3/1).
+  [/^https:\/\/github.com\/(.*?)\/(.*?)\/commit\/([0-9a-f]+?)$/.source]: (remote, repo, hash) => (doc) => {
     const commitTitleElement = doc.querySelector('.commit-title');
     const commitTitle = htmlEscape(commitTitleElement.textContent.trim());
     return `${githubIconHtml} Commit ${commitTitle} (${hash.substring(0, 6)}, ${remote}/${repo})`;
