@@ -26,3 +26,17 @@ footer [class*=rss__],
 footer [class*=logo__] {
     filter: hue-rotate(var(--negative-angle));
 }
+
+/* Fix box model, broken with filter. */
+.jv-nav-dropdown-container-content,
+.jv-nav-dropdown-container-bottom {
+    position: static !important;
+}
+
+.jv-nav-dropdown-item {
+    background-color: white;
+}
+
+.jv-nav-dropdown-item:nth-of-type(1n+6) {
+    display: none;
+}
