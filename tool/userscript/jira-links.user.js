@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.23
+// @version      0.24
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -33,6 +33,9 @@ const htmlEscape = (stringToEscape) => {
     ? stringToEscape.replace(reUnescapedHtml, (key) => htmlEscapes[key])
     : stringToEscape;
 };
+
+// Replaces consecutive space chars to avoid breaking formatting in ``` blocks.
+const oneLine = (string) => string.replace(/\s+/g, ' ');
 
 const iconTemplate = (base64png) => `<img style="vertical-align: middle;" src="data:image/png;base64,${base64png}"/>`;
 const jiraIconHtml = iconTemplate(`
@@ -112,7 +115,7 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
       expireDate,
       linkHtml: crossOriginRequest(pageUrl).then((response) => {
         const doc = parser.parseFromString(response.responseText, 'text/html');
-        return extractLinkHtmlFromDocument(doc);
+        return oneLine(extractLinkHtmlFromDocument(doc));
       })
     };
   }
