@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Respawn Workspace Switcher
-// @version      0.13
-// @description  Adds workspace switcher in Respawn debug bar
+// @name         JV Workspace Switcher
+// @version      0.14
+// @description  Adds workspace switcher on JV
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @match        http://*.jeuxvideo.com/*
@@ -10,21 +10,19 @@
 // ==/UserScript==
 
 GM_addStyle(`
-#content-debug select {
-  height: 100%;
+.jv-workspace-switcher {
+  position: fixed;
+  bottom: 10px;
+  height: 32px;
+  right: 10px;
   max-width: 280px
-}
-#content-debug.hiddenDebugBar select,
-#content-debug.on select {
-  display: none;
 }
 `);
 
 const removeDuplicates = (array) => array.filter((v, i, a) => a.indexOf(v) === i);
 
-const debugBar = document.querySelector('#content-debug');
-
-if (debugBar === null) {
+if (!document.querySelector('meta[property="og:site_name"').content.match(/jeuxvideo.com/i)) {
+  console.log('Worspace Switcher: not on jeuxvideo.com');
   return;
 }
 
@@ -64,6 +62,7 @@ if (currentWorkspace.endsWith('.dev')) {
 const workspaces = removeDuplicates([...defaultWorkspaces, ...recentWorkspaces]);
 
 const workspaceList = document.createElement('select');
+workspaceList.className = 'jv-workspace-switcher';
 
 const defaultOption = document.createElement('option');
 defaultOption.label = 'Workspace...';
@@ -81,7 +80,7 @@ workspaces.forEach((workspace) => {
   workspaceList.appendChild(option);
 });
 
-debugBar.appendChild(workspaceList);
+document.documentElement.appendChild(workspaceList);
 
 workspaceList.onchange = (event) => {
   const workspace = event.target.value;
