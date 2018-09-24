@@ -1,0 +1,7 @@
+/* URL starts with http://www.jeuxvideo.com/administration/interface_redaction/?mode= */
+.btn {
+    display: none;
+}
+.btn[title="Aperçu du brouillon dans une page"] {
+    display: inline-block;
+}
