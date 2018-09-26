@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         JV Workspace Switcher
-// @version      0.14
+// @version      0.15
 // @description  Adds workspace switcher on JV
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
@@ -13,9 +13,16 @@ GM_addStyle(`
 .jv-workspace-switcher {
   position: fixed;
   bottom: 10px;
-  height: 32px;
   right: 10px;
-  max-width: 280px
+  height: 32px;
+  z-index: 200;
+}
+.jv-workspace-switcher select {
+  max-width: 280px;
+  height: 100%;
+}
+.jv-workspace-switcher button {
+  height: 100%;
 }
 `);
 
@@ -30,13 +37,17 @@ const MAX_WORKSPACE_COUNT = 30;
 const RECENT_WORKSPACES_COOKIE_NAME = '__WORKSPACES_v1__';
 const WORKSPACE_SEPARATOR = '---------------';
 
+function switchWorkspace(newWorkspace) {
+  document.location.href = document.location.href.replace(/\/\/.*?(.jeuxvideo.com.*)$/, `//${newWorkspace}$1`);
+}
+
 const defaultWorkspaces = [
   'www',
-  'preprod-www',
   'dorianm1-www.dev',
   'adrienw1-www.dev',
   'antoinez1-www.dev',
   'bricel1-www.dev',
+  'preprod-www',
   'demo1-www.dev',
   'demo2-www.dev',
   WORKSPACE_SEPARATOR
@@ -61,8 +72,10 @@ if (currentWorkspace.endsWith('.dev')) {
 
 const workspaces = removeDuplicates([...defaultWorkspaces, ...recentWorkspaces]);
 
+const workspaceSwitcher = document.createElement('div');
+workspaceSwitcher.className = 'jv-workspace-switcher';
+
 const workspaceList = document.createElement('select');
-workspaceList.className = 'jv-workspace-switcher';
 
 const defaultOption = document.createElement('option');
 defaultOption.label = 'Workspace...';
@@ -80,12 +93,20 @@ workspaces.forEach((workspace) => {
   workspaceList.appendChild(option);
 });
 
-document.documentElement.appendChild(workspaceList);
-
 workspaceList.onchange = (event) => {
   const workspace = event.target.value;
   if (!workspace) {
     return;
   }
-  document.location.href = document.location.href.replace(/\/\/.*?(.jeuxvideo.com.*)$/, `//${workspace}$1`);
+  switchWorkspace(workspace);
 };
+
+defaultWorkspaces.slice(0, 2).forEach((workspace) => {
+  const switchButton = document.createElement('button');
+  switchButton.textContent = workspace;
+  switchButton.onclick = () => switchWorkspace(switchButton.textContent);
+  workspaceSwitcher.appendChild(switchButton);
+});
+
+workspaceSwitcher.appendChild(workspaceList);
+document.documentElement.appendChild(workspaceSwitcher);
