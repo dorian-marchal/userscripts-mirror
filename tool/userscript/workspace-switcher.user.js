@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         JV Workspace Switcher
-// @version      0.15
+// @version      0.16
 // @description  Adds workspace switcher on JV
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
@@ -24,6 +24,9 @@ GM_addStyle(`
 .jv-workspace-switcher button {
   height: 100%;
 }
+.jv-workspace-switcher button:hover {
+  filter: brightness(150%);
+}
 `);
 
 const removeDuplicates = (array) => array.filter((v, i, a) => a.indexOf(v) === i);
@@ -41,9 +44,10 @@ function switchWorkspace(newWorkspace) {
   document.location.href = document.location.href.replace(/\/\/.*?(.jeuxvideo.com.*)$/, `//${newWorkspace}$1`);
 }
 
+const workspaceButtons = [['www', '#7f2238'], ['dorianm1-www.dev', '#004b43']];
+
 const defaultWorkspaces = [
-  'www',
-  'dorianm1-www.dev',
+  ...workspaceButtons.map(([workspace]) => workspace),
   'adrienw1-www.dev',
   'antoinez1-www.dev',
   'bricel1-www.dev',
@@ -101,9 +105,14 @@ workspaceList.onchange = (event) => {
   switchWorkspace(workspace);
 };
 
-defaultWorkspaces.slice(0, 2).forEach((workspace) => {
+workspaceButtons.forEach(([workspace, bgColor]) => {
   const switchButton = document.createElement('button');
   switchButton.textContent = workspace;
+  switchButton.style = `
+    background-color: ${bgColor};
+    color: #fff;
+    border: none;
+  `;
   switchButton.onclick = () => switchWorkspace(switchButton.textContent);
   workspaceSwitcher.appendChild(switchButton);
 });
