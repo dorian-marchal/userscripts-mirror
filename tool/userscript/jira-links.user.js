@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Better links
-// @version      0.25
+// @version      0.26
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/jira-links.user.js
@@ -160,9 +160,9 @@ const linkHtmlExtractorCreatorByPattern = {
       `
       : null;
   },
-  // Github Pull Request (https://regex101.com/r/PEzcHy/3).
-  [/^https:\/\/github.com\/.*?\/(.*?)\/pull\/(\d+)(?:\/commits\/([a-f0-9]{6}))?(?:.*?#(?:issuecomment-|r)(\d+))?/
-    .source]: (projectName, prId, commitHash, commentId) => (doc) => {
+  // Github Pull Request (https://regex101.com/r/PEzcHy/5).
+  [/^https:\/\/github.com\/.*?\/(.*?)\/pull\/(\d+)(?:\/commits\/([a-f0-9]{6}))?(\/commits)?(?:.*?#(?:issuecomment-|r)(\d+))?/
+    .source]: (projectName, prId, commitHash, isCommitList, commentId) => (doc) => {
     const titleElement = doc.querySelector('h1.gh-header-title span');
     const title = htmlEscape(titleElement.textContent.trim());
     const stateElement = doc.querySelector('.gh-header .State');
@@ -175,7 +175,7 @@ const linkHtmlExtractorCreatorByPattern = {
         ${stateText === 'Merged' ? tagHtml('✔', '#6f42c1') : ''}
         ${stateText === 'Open' ? tagHtml('open', '#2cbe4e') : ''}
         ${stateText === 'Closed' ? tagHtml('✘', '#cb2431') : ''}
-        PR ${title}
+        PR ${isCommitList ? 'commits' : ''} ${title}
         (${commitIndicator}${commentIndicator}${projectName}#${prId})
       `
       : null;
