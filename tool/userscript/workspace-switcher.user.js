@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         JV Workspace Switcher
-// @version      0.16
+// @version      0.17
 // @description  Adds workspace switcher on JV
 // @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
@@ -54,6 +54,7 @@ const defaultWorkspaces = [
   'preprod-www',
   'demo1-www.dev',
   'demo2-www.dev',
+  'respawn',
   WORKSPACE_SEPARATOR
 ];
 
