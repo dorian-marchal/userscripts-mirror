@@ -1,9 +1,7 @@
 // ==UserScript==
-// @name         JV Workspace Switcher
+// @name         jv-workspace-switcher
 // @version      0.17
 // @description  Adds workspace switcher on JV
-// @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
-// @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/workspace-switcher.user.js
 // @match        http://*.jeuxvideo.com/*
 // @match        https://*.jeuxvideo.com/*
 // @grant        GM_addStyle

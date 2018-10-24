@@ -1,8 +1,6 @@
 // ==UserScript==
-// @name         Avatars on Github lists
+// @name         avatars-on-github-lists
 // @version      0.1
-// @updateURL    https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/avatars-on-github-lists.user.js
-// @downloadURL  https://github.com/dorian-marchal/phoenix/raw/userscript-jira-links/tool/userscript/avatars-on-github-lists.user.js
 // @match        https://github.com/*
 // @grant        GM_addStyle
 // ==/UserScript==

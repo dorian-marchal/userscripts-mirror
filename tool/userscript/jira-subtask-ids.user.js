@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         JIRA Subtask IDs
+// @name         jira-subtask-ids
 // @match        https://jira.webedia.fr/browse/*
 // @grant        none
 // ==/UserScript==
