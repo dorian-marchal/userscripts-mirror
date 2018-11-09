@@ -24,6 +24,7 @@ footer [class*="google__"],
 footer [class*="youtube__"],
 footer [class*="rss__"],
 footer [class*="logo__"],
+header .live-indicator,
 .video-footer-container {
   filter: hue-rotate(var(--negative-angle));
 }
