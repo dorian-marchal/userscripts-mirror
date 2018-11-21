@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         avatars-on-github-lists
+// @name         avatars-on-github-lists.user
 // @version      0.1
 // @match        https://github.com/*
 // @grant        GM_addStyle

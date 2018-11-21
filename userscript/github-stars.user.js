@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         github-stars
+// @name         github-stars.user
 // @version      0.1
 // @match        https://github.com/*
 // @grant        none

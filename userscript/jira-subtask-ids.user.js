@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         jira-subtask-ids
+// @name         jira-subtask-ids.user
+// @version      1
 // @match        https://jira.webedia.fr/browse/*
 // @grant        none
 // ==/UserScript==

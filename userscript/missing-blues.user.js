@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         missing-blues
+// @name         missing-blues.user
 // @version      0.1
 // @match        https://webedia.eurecia.com/eurecia/planningVacation/*
 // @grant        none

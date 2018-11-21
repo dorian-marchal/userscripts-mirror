@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         blue-pull-requests
+// @name         blue-pull-requests.user
+// @version      1
 // @match        https://github.com/search?q=-label%3A%E2%98%A0+org%3AWebediaGaming+is%3Apr+is%3Aopen+author%3Adorian-marchal++author%3Aantoinezimmermann+author%3ABrykou+author%3AadrienWeiss&type=Issues
 // @grant        GM_addStyle
 // ==/UserScript==

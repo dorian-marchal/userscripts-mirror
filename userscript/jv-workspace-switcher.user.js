@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         jv-workspace-switcher
+// @name         jv-workspace-switcher.user
 // @version      0.17
 // @description  Adds workspace switcher on JV
 // @match        http://*.jeuxvideo.com/*
