@@ -1,0 +1,5 @@
+/* match ^https?://dorianm1.+?-www.dev.jeuxvideo\.com.*$ */
+:root {
+  --angle: 50deg;
+  --negative-angle: calc(-1 * var(--angle));
+}
