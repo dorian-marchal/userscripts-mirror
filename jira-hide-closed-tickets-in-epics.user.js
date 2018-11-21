@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Hide closed tickets in epics
+// @name        jira-hide-closed-tickets-in-epics
 // @namespace   dorian.marchal
 // @include     https://jira.webedia.fr/browse/*
 // @version     1
