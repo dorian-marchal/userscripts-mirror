@@ -153,7 +153,7 @@ const linkHtmlExtractorCreatorByPattern = {
         ${stateText === 'À valider' ? tagHtml('à valider', '#ffd351', '#000') : ''}
         ${stateText === 'Terminé' ? tagHtml('✔', '#14892c') : ''}
         ${['Closed', 'Fermée'].includes(stateText) ? tagHtml('✘', '#14892c') : ''}
-        ${jiraId} ${title}
+        [${jiraId}] ${title}
         ${isCommentLink ? `(commentaire ${commentId})` : ''}
       `
       : null;
