@@ -198,7 +198,7 @@ const linkHtmlExtractorCreatorByPattern = {
 };
 
 const replaceLinksText = function() {
-  const jiraLinksSelector = '.c-message__body a';
+  const jiraLinksSelector = '.c-message__body a, #channel_topic_text a';
   const githubLinksSelector = '.markdown-body a';
   const links = document.querySelectorAll(`
     ${jiraLinksSelector}:not(.${ALREADY_REPLACED_CLASS}),
