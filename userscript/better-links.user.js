@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         better-links.user
-// @version      0.27
+// @version      0.28
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @match        https://wgaming.slack.com/*
 // @match        https://github.com/*
