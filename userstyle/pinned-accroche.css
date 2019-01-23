@@ -1,0 +1,20 @@
+/* domain jeuxvideo.com */
+.item.pinned .mask-img:before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 0;
+  border: solid 20px transparent;
+  border-top-color: #fd5700;
+  border-right-color: #fd5700;
+}
+
+.item.pinned .mask-img:after {
+  content: '🔒';
+  font-family: 'icons';
+  font-size: 14px;
+  position: absolute;
+  top: 6px;
+  right: 5px;
+  color: white;
+}
