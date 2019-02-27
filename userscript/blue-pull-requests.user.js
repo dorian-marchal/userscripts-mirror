@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         blue-pull-requests.user
-// @version      3
+// @version      4
 // @match        https://github.com/search?o=desc&s=updated&p=1&q=-label%3A%E2%98%A0+-label%3Aold+org%3AWebediaGaming+is%3Apr+is%3Aopen+author%3Adorian-marchal++author%3AadrienWeiss+author%3Abibislayer+author%3Aantca+author%3Aericroge-webedia+author%3ARomainCorralJVC&type=Issues
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -12,7 +12,7 @@ GM_addStyle(`
 `);
 
 const ids = [];
-document.querySelectorAll('.issue-list-item > span.ml-3').forEach((item) => {
+document.querySelectorAll('.issue-list-item span.ml-3').forEach((item) => {
   const id = item.textContent.trim().substr(1);
   ids.push(id);
 });
