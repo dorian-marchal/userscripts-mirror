@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         better-links.user
-// @version      0.28
+// @version      0.29
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @match        https://wgaming.slack.com/*
 // @match        https://github.com/*
@@ -194,6 +194,22 @@ const linkHtmlExtractorCreatorByPattern = {
     const commitTitleElement = doc.querySelector('.commit-title');
     const commitTitle = htmlEscape(commitTitleElement.textContent.trim());
     return `${githubIconHtml} Commit ${commitTitle} (${hash.substring(0, 6)}, ${remote}/${repo})`;
+  },
+  // Github issue link (https://regex101.com/r/k8LZ2O/3).
+  [/^https:\/\/github.com\/.*?\/(.*?)\/issues\/(\d+?)$/.source]: (repo, issueId) => (doc) => {
+    const titleElement = doc.querySelector('h1.gh-header-title span');
+    const title = htmlEscape(titleElement.textContent.trim());
+    const stateElement = doc.querySelector('.gh-header .State');
+    const stateText = stateElement ? stateElement.textContent.trim() : null;
+    return titleElement
+      ? `
+        ${githubIconHtml}
+        ${stateText === 'Open' ? tagHtml('open', '#2cbe4e') : ''}
+        ${stateText === 'Closed' ? tagHtml('✘', '#cb2431') : ''}
+        Issue ${title}
+        (${repo}#${issueId})
+      `
+      : null;
   }
 };
 
