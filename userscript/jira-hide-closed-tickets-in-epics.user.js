@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        jira-hide-closed-tickets-in-epics.user
-// @include     https://jira.webedia.fr/browse/*
-// @version     1
+// @include     https://jira.webedia-group.net/browse/*
+// @version     2
 // @grant       none
 // ==/UserScript==
 

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         better-links.user
-// @version      0.29
+// @version      0.30
 // @description  Replaces link text for Github PRs and JIRA tickets.
 // @match        https://wgaming.slack.com/*
 // @match        https://github.com/*
 // @grant        GM_xmlhttpRequest
-// @connect      jira.webedia.fr
+// @connect      jira.webedia-group.net
 // @connect      github.com
 // ==/UserScript==
 
@@ -122,10 +122,11 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
 };
 
 const linkHtmlExtractorCreatorByPattern = {
-  // JIRA (https://regex101.com/r/hgS2iF/1).
-  [/^https:\/\/jira.webedia.fr\/browse\/([^?\s]*)(?:\?focusedCommentId=(\d+))?/.source]: (jiraId, commentId) => (
-    doc
-  ) => {
+  // JIRA (https://regex101.com/r/hgS2iF/5).
+  [/^https:\/\/jira\.webedia-group\.net\/browse\/([^?\s]*)(?:\?focusedCommentId=(\d+))?/.source]: (
+    jiraId,
+    commentId
+  ) => (doc) => {
     const titleElement = doc.querySelector('#summary-val');
     const title = htmlEscape(titleElement.textContent);
     const stateElement = doc.querySelector('#status-val');
