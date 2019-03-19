@@ -5,7 +5,7 @@
 // @match        https://wgaming.slack.com/*
 // @match        https://github.com/*
 // @grant        GM_xmlhttpRequest
-// @connect      jira.webedia.fr
+// @connect      jira.webedia-group.net
 // @connect      github.com
 // ==/UserScript==
 
@@ -122,8 +122,8 @@ const getLinkHtml = async function(pageUrl, extractLinkHtmlFromDocument) {
 };
 
 const linkHtmlExtractorCreatorByPattern = {
-  // JIRA (https://regex101.com/r/hgS2iF/1).
-  [/^https:\/\/jira.webedia.fr\/browse\/([^?\s]*)(?:\?focusedCommentId=(\d+))?/.source]: (jiraId, commentId) => (
+  // JIRA (https://regex101.com/r/hgS2iF/6).
+  [/^https:\/\/jira.webedia-group.net\/browse\/([^?\s]*)(?:\?focusedCommentId=(\d+))?/.source]: (jiraId, commentId) => (
     doc
   ) => {
     const titleElement = doc.querySelector('#summary-val');
